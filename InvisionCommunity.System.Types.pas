@@ -3,7 +3,7 @@ unit InvisionCommunity.System.Types;
 interface
 
 uses
-  InvisionCommunity.JsonBaseClass;
+  InvisionCommunity.Core.JsonBaseClass;
 
 type
   IicSystemResult = interface
