@@ -11,12 +11,13 @@ type
   TicRequest = class
   private
     FToken: string;
+    FBasicAuth: TNetHeader;
     FHttp: THTTPClient;
     FUrl: TURI;
     FOnError: TProc<Exception>;
     function GetUrl: string;
     procedure SetUrl(const Value: string);
-    procedure MyOnAuth(const Sender: TObject; AnAuthTarget: TAuthTargetType; const ARealm, AURL: string; var AUserName, APassword: string; var AbortAuth: Boolean; var Persistence: TAuthPersistenceType);
+    procedure SetToken(const Value: string);
   protected
     procedure DoCheckError(const AResponse: string);
     function Get(const Path: string): string;
@@ -24,7 +25,7 @@ type
     constructor Create;
     destructor Destroy; override;
   published
-    property Token: string read FToken write FToken;
+    property Token: string read FToken write SetToken;
     property Url: string read GetUrl write SetUrl;
     property OnError: TProc<Exception> read FOnError write FOnError;
   end;
@@ -33,6 +34,7 @@ implementation
 
 uses
   System.JSON,
+  System.NetEncoding,
   InvisionCommunity.Exceptions;
 
 { TicRequest }
@@ -41,8 +43,6 @@ constructor TicRequest.Create;
 begin
   FHttp := THTTPClient.Create;
   FHttp.AllowCookies := true;
-  FHttp.AuthEvent := MyOnAuth;
-
 end;
 
 destructor TicRequest.Destroy;
@@ -76,7 +76,7 @@ end;
 function TicRequest.Get(const Path: string): string;
 begin
   FUrl.Path := Path;
-  Result := FHttp.Get(FUrl.ToString).ContentAsString;
+  Result := FHttp.Get(Url, nil, [FBasicAuth]).ContentAsString;
   DoCheckError(Result);
 end;
 
@@ -85,10 +85,10 @@ begin
   Result := FUrl.ToString;
 end;
 
-procedure TicRequest.MyOnAuth(const Sender: TObject; AnAuthTarget: TAuthTargetType; const ARealm, AURL: string; var AUserName, APassword: string; var AbortAuth: Boolean; var Persistence: TAuthPersistenceType);
+procedure TicRequest.SetToken(const Value: string);
 begin
-  AUserName := Token;
-  APassword := '';
+  FToken := Value;
+  FBasicAuth := TNetHeader.Create('Authorization', 'Basic ' + TNetEncoding.Base64.Encode(Value + ':'));
 end;
 
 procedure TicRequest.SetUrl(const Value: string);
