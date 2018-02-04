@@ -1,4 +1,4 @@
-program Project7;
+program InvComTest;
 
 {$APPTYPE CONSOLE}
 
@@ -9,7 +9,8 @@ uses
   InvisionCommunity.System in 'InvisionCommunity.System.pas',
   InvisionCommunity.System.Types in 'InvisionCommunity.System.Types.pas',
   InvisionCommunity.Core.JsonBaseClass in 'InvisionCommunity.Core.JsonBaseClass.pas',
-  InvisionCommunity.Core.Api in 'InvisionCommunity.Core.Api.pas';
+  InvisionCommunity.Core.Api in 'InvisionCommunity.Core.Api.pas',
+  InvisionCommunity.Exceptions in 'InvisionCommunity.Exceptions.pas';
 
 procedure Test;
 var

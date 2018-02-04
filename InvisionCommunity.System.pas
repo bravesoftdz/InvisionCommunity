@@ -22,6 +22,7 @@ var
   x: string;
 begin
   x := Get('/api/core/hello');
+  Result := TicSystemResult.Create(x);
 end;
 
 end.
