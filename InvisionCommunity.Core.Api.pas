@@ -8,7 +8,21 @@ uses
   System.SysUtils;
 
 type
-  TicRequest = class
+  IicRequest = interface
+    ['{12414A80-A055-4ACC-AA79-1AD6498C2194}']
+    function GetUrl: string;
+    procedure SetUrl(const Value: string);
+    function GetToken: string;
+    procedure SetToken(const Value: string);
+    function GetOnError: TProc<Exception>;
+    procedure SetOnError(const Value: TProc<Exception>);
+    //
+    property Token: string read GetToken write SetToken;
+    property Url: string read GetUrl write SetUrl;
+    property OnError: TProc<Exception> read GetOnError write SetOnError;
+  end;
+
+  TicRequest = class(TInterfacedObject, IicRequest)
   private
     FToken: string;
     FBasicAuth: TNetHeader;
@@ -18,16 +32,20 @@ type
     function GetUrl: string;
     procedure SetUrl(const Value: string);
     procedure SetToken(const Value: string);
+    function GetToken: string;
+    function GetOnError: TProc<Exception>;
+    procedure SetOnError(const Value: TProc<Exception>);
   protected
     procedure DoCheckError(const AResponse: string);
     function Get(const Path: string): string;
   public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(const AUrl, AToken: string); overload;
     destructor Destroy; override;
   published
-    property Token: string read FToken write SetToken;
+    property Token: string read GetToken write SetToken;
     property Url: string read GetUrl write SetUrl;
-    property OnError: TProc<Exception> read FOnError write FOnError;
+    property OnError: TProc<Exception> read GetOnError write SetOnError;
   end;
 
 implementation
@@ -42,7 +60,14 @@ uses
 constructor TicRequest.Create;
 begin
   FHttp := THTTPClient.Create;
-  FHttp.AllowCookies := true;
+  FHttp.AllowCookies := True;
+end;
+
+constructor TicRequest.Create(const AUrl, AToken: string);
+begin
+  Create;
+  Url := AUrl;
+  Token := AToken;
 end;
 
 destructor TicRequest.Destroy;
@@ -59,7 +84,7 @@ begin
   FJSON := TJSONObject.ParseJSONValue(AResponse) as TJSONObject;
   LExcept := TInvisionCommunityExcception.Create('');
   try
-    if not FJSON.Values['errorCode'].Null then
+    if Assigned(FJSON.Values['errorCode']) then
     begin
       LExcept.Message := Format('%S: %S', [FJSON.Values['errorCode'].Value, FJSON.Values['errorMessage'].Value]);
       if Assigned(OnError) then
@@ -80,9 +105,24 @@ begin
   DoCheckError(Result);
 end;
 
+function TicRequest.GetOnError: TProc<Exception>;
+begin
+  Result := FOnError
+end;
+
+function TicRequest.GetToken: string;
+begin
+  Result := FToken;
+end;
+
 function TicRequest.GetUrl: string;
 begin
   Result := FUrl.ToString;
+end;
+
+procedure TicRequest.SetOnError(const Value: TProc<Exception>);
+begin
+  FOnError := Value;
 end;
 
 procedure TicRequest.SetToken(const Value: string);
@@ -93,7 +133,7 @@ end;
 
 procedure TicRequest.SetUrl(const Value: string);
 begin
-  FUrl := TUri.Create(Value);
+  FUrl := TURI.Create(Value);
 end;
 
 end.

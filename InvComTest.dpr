@@ -11,19 +11,33 @@ uses
   InvisionCommunity.Core.JsonBaseClass in 'InvisionCommunity.Core.JsonBaseClass.pas',
   InvisionCommunity.Core.Api in 'InvisionCommunity.Core.Api.pas',
   InvisionCommunity.Exceptions in 'InvisionCommunity.Exceptions.pas',
-  System.Net.HttpClient in 'System.Net.HttpClient.pas';
+  InvisionCommunity.Forums in 'InvisionCommunity.Forums.pas',
+  InvisionCommunity.Forums.Types in 'InvisionCommunity.Forums.Types.pas',
+  InvisionCommunity.Types in 'InvisionCommunity.Types.pas';
 
 procedure Test;
 var
-  icSystem: TicSystem;
+  icSystem: IicSystem;
+  icForum: IicForums;
+  I: Integer;
 begin
-  icSystem := TicSystem.Create;
+  icSystem := TicSystem.Create('http://fire-monkey.ru', '6a0c2f53657a05dc852637fd6b49ec03');
+  icForum := TicForums.Create('http://fire-monkey.ru', '6a0c2f53657a05dc852637fd6b49ec03');
   try
-    icSystem.Token := '6a0c2f53657a05dc852637fd6b49ec03';
-    icSystem.Url := 'http://fire-monkey.ru';
-    Writeln(icSystem.Hello.communityName);
+    with icSystem.Hello do
+    begin
+      Writeln(communityName);
+      Writeln(communityUrl);
+      Writeln(ipsVersion);
+    end;
+    with icForum.GetTopics do
+    begin
+      for I := Low(Results) to High(Results) do
+        Writeln(Results[I].Title);
+    end;
+
   finally
-    icSystem.Free;
+  //  icSystem.Free;
   end;
 end;
 

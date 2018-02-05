@@ -7,7 +7,12 @@ uses
   InvisionCommunity.Core.Api;
 
 type
-  TicSystem = class(TicRequest)
+  IicSystem = interface(IicRequest)
+    ['{5E03F911-4D08-4E34-A933-F571716FF9CD}']
+    function Hello: IicSystemResult;
+  end;
+
+  TicSystem = class(TicRequest, IicSystem)
   private
   public
     function Hello: IicSystemResult;
@@ -18,11 +23,8 @@ implementation
 { TicSystem }
 
 function TicSystem.Hello: IicSystemResult;
-var
-  x: string;
 begin
-  x := Get('/api/core/hello');
-  Result := TicSystemResult.Create(x);
+  Result := TicSystemResult.Create(Get('/api/core/hello'));
 end;
 
 end.
