@@ -10,15 +10,15 @@ uses
 type
   IicRequest = interface
     ['{12414A80-A055-4ACC-AA79-1AD6498C2194}']
-    function GetUrl: string;
-    procedure SetUrl(const Value: string);
+    function GetUrl: TURI;
+    procedure SetUrl(const Value: TURI);
     function GetToken: string;
     procedure SetToken(const Value: string);
     function GetOnError: TProc<Exception>;
     procedure SetOnError(const Value: TProc<Exception>);
     //
     property Token: string read GetToken write SetToken;
-    property Url: string read GetUrl write SetUrl;
+    property Url: TURI read GetUrl write SetUrl;
     property OnError: TProc<Exception> read GetOnError write SetOnError;
   end;
 
@@ -29,22 +29,27 @@ type
     FHttp: THTTPClient;
     FUrl: TURI;
     FOnError: TProc<Exception>;
-    function GetUrl: string;
-    procedure SetUrl(const Value: string);
+    function GetUrl: TURI;
+    procedure SetUrl(const Value: TURI);
     procedure SetToken(const Value: string);
     function GetToken: string;
     function GetOnError: TProc<Exception>;
     procedure SetOnError(const Value: TProc<Exception>);
   protected
     procedure DoCheckError(const AResponse: string);
-    function Get(const Path: string): string;
+    procedure SetPath(const APath: string);
+    procedure AddParameter(const AKey, AValue: string); overload;
+    procedure AddParameter(const AKey: string; const AValue: Integer); overload;
+
+    //
+    function Get: string;
   public
     constructor Create; overload;
     constructor Create(const AUrl, AToken: string); overload;
     destructor Destroy; override;
   published
     property Token: string read GetToken write SetToken;
-    property Url: string read GetUrl write SetUrl;
+    property Url: TURI read GetUrl write SetUrl;
     property OnError: TProc<Exception> read GetOnError write SetOnError;
   end;
 
@@ -63,10 +68,22 @@ begin
   FHttp.AllowCookies := True;
 end;
 
+procedure TicRequest.AddParameter(const AKey, AValue: string);
+begin
+  if not AValue.IsEmpty then
+    FUrl.AddParameter(AKey, AValue);
+end;
+
+procedure TicRequest.AddParameter(const AKey: string; const AValue: Integer);
+begin
+  if AValue >= 0 then
+    AddParameter(AKey, AValue.ToString);
+end;
+
 constructor TicRequest.Create(const AUrl, AToken: string);
 begin
   Create;
-  Url := AUrl;
+  Url := TURI.Create(AUrl);
   Token := AToken;
 end;
 
@@ -79,29 +96,34 @@ end;
 procedure TicRequest.DoCheckError(const AResponse: string);
 var
   FJSON: TJSONObject;
+  LTest: string;
   LExcept: TInvisionCommunityExcception;
 begin
-  FJSON := TJSONObject.ParseJSONValue(AResponse) as TJSONObject;
-  LExcept := TInvisionCommunityExcception.Create('');
-  try
-    if Assigned(FJSON.Values['errorCode']) then
-    begin
-      LExcept.Message := Format('%S: %S', [FJSON.Values['errorCode'].Value, FJSON.Values['errorMessage'].Value]);
-      if Assigned(OnError) then
-        OnError(LExcept)
+  if AResponse.contains('<!DOCTYPE html>') then
+  begin
+    LExcept := TInvisionCommunityExcception.Create('Website return html');
+  end
+  else
+  begin
+    FJSON := TJSONObject.ParseJSONValue(AResponse) as TJSONObject;
+    try
+      if FJSON.TryGetValue<string>('errorCode', LTest) then
+        LExcept := TInvisionCommunityExcception.Create(Format('%S: %S', [FJSON.Values['errorCode'].Value, FJSON.Values['errorMessage'].Value]))
       else
-        raise LExcept;
-    end;
-  finally
-  //  LExcept.Free;
-    FJSON.Free;
+        Exit;
+    finally
+      FJSON.Free;
+    end
   end;
+  if Assigned(OnError) then
+    OnError(LExcept)
+  else
+    raise LExcept;
 end;
 
-function TicRequest.Get(const Path: string): string;
+function TicRequest.Get: string;
 begin
-  FUrl.Path := Path;
-  Result := FHttp.Get(Url, nil, [FBasicAuth]).ContentAsString;
+  Result := FHttp.Get(Url.ToString, nil, [FBasicAuth]).ContentAsString;
   DoCheckError(Result);
 end;
 
@@ -115,14 +137,19 @@ begin
   Result := FToken;
 end;
 
-function TicRequest.GetUrl: string;
+function TicRequest.GetUrl: TURI;
 begin
-  Result := FUrl.ToString;
+  Result := FUrl;
 end;
 
 procedure TicRequest.SetOnError(const Value: TProc<Exception>);
 begin
   FOnError := Value;
+end;
+
+procedure TicRequest.SetPath(const APath: string);
+begin
+  FUrl.Path := APath;
 end;
 
 procedure TicRequest.SetToken(const Value: string);
@@ -131,9 +158,9 @@ begin
   FBasicAuth := TNetHeader.Create('Authorization', 'Basic ' + TNetEncoding.Base64.Encode(Value + ':'));
 end;
 
-procedure TicRequest.SetUrl(const Value: string);
+procedure TicRequest.SetUrl(const Value: TURI);
 begin
-  FUrl := TURI.Create(Value);
+  FUrl := Value;
 end;
 
 end.

@@ -19,10 +19,11 @@ procedure Test;
 var
   icSystem: IicSystem;
   icForum: IicForums;
+  LTopics: IicArray<IicTopicObject>;
   I: Integer;
 begin
-  icSystem := TicSystem.Create('http://fire-monkey.ru', '6a0c2f53657a05dc852637fd6b49ec03');
-  icForum := TicForums.Create('http://fire-monkey.ru', '6a0c2f53657a05dc852637fd6b49ec03');
+  icSystem := TicSystem.Create('http://fire-monkey.ru', '18801d4912ac06457bfb3b9fa0123f7a');
+  icForum := TicForums.Create('http://fire-monkey.ru', '18801d4912ac06457bfb3b9fa0123f7a');
   try
     with icSystem.Hello do
     begin
@@ -30,10 +31,12 @@ begin
       Writeln(communityUrl);
       Writeln(ipsVersion);
     end;
-    with icForum.GetTopics do
+    LTopics := icForum.GetTopics('', '', -1, -1, -1, -1, -1, -1, -1, '', '', -1);
+    LTopics := icForum.GetTopics('', '', -1, -1, -1, -1, -1, -1, -1, '', '', LTopics.TotalPages);
+
     begin
-      for I := Low(Results) to High(Results) do
-        Writeln(Results[I].Title);
+      for I := Low(LTopics.Results) to High(LTopics.Results) do
+        Writeln(LTopics.Results[I].Title);
     end;
 
   finally

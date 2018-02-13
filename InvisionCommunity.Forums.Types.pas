@@ -57,7 +57,7 @@ type
     function photoUrl: string;
     function profileUrl: string;
     function validating: Boolean;
-    function posts: Integer;
+    function Posts: Integer;
     function lastActivity: TDateTime;
     function lastVisit: TDateTime;
     function lastPost: TDateTime;
@@ -80,7 +80,7 @@ type
     ['{52C3BADE-2F31-4A67-8F43-5BF8A12CE871}']
     function ID: Integer;
     function Title: string;
-    function votes: integer;
+    function votes: Integer;
     function questions: TArray<IicQuestionObject>;
   end;
 {$ENDREGION}
@@ -231,7 +231,7 @@ end;
 
 function TicTopicObject.Prefix: string;
 begin
-
+  Result := ReadToSimpleType<string>('prefix');
 end;
 
 function TicTopicObject.rating: Single;
@@ -251,7 +251,7 @@ end;
 
 function TicTopicObject.url: string;
 begin
-
+  Result := ReadToSimpleType<string>('url');
 end;
 
 function TicTopicObject.Views: Integer;

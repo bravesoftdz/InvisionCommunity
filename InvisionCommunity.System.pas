@@ -24,7 +24,8 @@ implementation
 
 function TicSystem.Hello: IicSystemResult;
 begin
-  Result := TicSystemResult.Create(Get('/api/core/hello'));
+  SetPath('/api/core/hello');
+  Result := TicSystemResult.Create(Get);
 end;
 
 end.
