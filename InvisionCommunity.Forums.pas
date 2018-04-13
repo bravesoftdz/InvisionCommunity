@@ -5,25 +5,25 @@ interface
 uses
   InvisionCommunity.Core.Api,
   InvisionCommunity.Types,
-  InvisionCommunity.forums.Types;
+  InvisionCommunity.Forums.Types;
 
 type
   IicForums = interface(IicRequest)
     ['{4AA39BC9-A179-4C20-9A90-CF1D3A86E34E}']
     function GetForums: IicArray<IicForumObject>;
-    function GetTopics(const forums, authors: string; //
+    function GetTopics(const Forums, authors: string; //
       const hasBestAnswer, hasPoll, locked, hidden, pinned, featured, archived: Integer; //
       const sortBy, sortDir: string; //
-      const page: Integer//
+      const page: Integer //
     ): IicArray<IicTopicObject>;
   end;
 
   TicForums = class(TicRequest, IicForums)
     function GetForums: IicArray<IicForumObject>;
-    function GetTopics(const forums, authors: string; //
+    function GetTopics(const Forums, authors: string; //
       const hasBestAnswer, hasPoll, locked, hidden, pinned, featured, archived: Integer; //
       const sortBy, sortDir: string; //
-      const page: Integer//
+      const page: Integer //
     ): IicArray<IicTopicObject>;
   end;
 
@@ -40,13 +40,13 @@ begin
   Result := TicArray<IicForumObject>.Create(Get, TicForumObject);
 end;
 
-function TicForums.GetTopics(//
-  const forums, authors: string; //
-  const hasBestAnswer, hasPoll, locked, hidden, pinned, featured, archived: Integer;  //
+function TicForums.GetTopics( //
+  const Forums, authors: string; //
+  const hasBestAnswer, hasPoll, locked, hidden, pinned, featured, archived: Integer; //
   const sortBy, sortDir: string; //
   const page: Integer): IicArray<IicTopicObject>;
 begin
-  AddParameter('forums', forums);
+  AddParameter('forums', Forums);
   AddParameter('authors', authors);
   AddParameter('hasBestAnswer', hasBestAnswer);
   AddParameter('hasPoll', hasPoll);

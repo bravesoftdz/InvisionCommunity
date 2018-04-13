@@ -39,13 +39,12 @@ type
     function fields: TArray<IicGroupObject>;
   end;
 {$ENDREGION}
-
 {$REGION 'MemberObject'}
 
   IicMemberObject = interface
     ['{143E1882-93EA-400B-96E7-4B3309F6FB5A}']
     function ID: Integer;
-    function name: string;
+    function Name: string;
     function Title: string;
     function timezone: string;
     function formattedName: string;
@@ -96,8 +95,8 @@ type
     function hidden: Boolean;
     function url: string;
   end;
-  {$ENDREGION}
-  {$REGION 'TopicObject'}
+{$ENDREGION}
+{$REGION 'TopicObject'}
 
   IicTopicObject = interface
     ['{33162B6C-8BEE-41FD-87CE-0946C08A9C00}']
@@ -141,7 +140,7 @@ type
     function url: string;
     function rating: Single;
   end;
-  {$ENDREGION}
+{$ENDREGION}
 
 implementation
 

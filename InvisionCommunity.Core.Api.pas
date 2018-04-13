@@ -36,6 +36,7 @@ type
     function GetOnError: TProc<Exception>;
     procedure SetOnError(const Value: TProc<Exception>);
   protected
+    procedure DoCallError(AException: Exception);
     procedure DoCheckError(const AResponse: string);
     procedure SetPath(const APath: string);
     procedure AddParameter(const AKey, AValue: string); overload;
@@ -93,6 +94,14 @@ begin
   inherited;
 end;
 
+procedure TicRequest.DoCallError(AException: Exception);
+begin
+  if Assigned(OnError) then
+    OnError(AException)
+  else
+    raise AException;
+end;
+
 procedure TicRequest.DoCheckError(const AResponse: string);
 var
   FJSON: TJSONObject;
@@ -102,23 +111,29 @@ begin
   if AResponse.contains('<!DOCTYPE html>') then
   begin
     LExcept := TInvisionCommunityExcception.Create('Website return html');
-  end
-  else
-  begin
-    FJSON := TJSONObject.ParseJSONValue(AResponse) as TJSONObject;
     try
-      if FJSON.TryGetValue<string>('errorCode', LTest) then
-        LExcept := TInvisionCommunityExcception.Create(Format('%S: %S', [FJSON.Values['errorCode'].Value, FJSON.Values['errorMessage'].Value]))
-      else
-        Exit;
+      DoCallError(LExcept);
+      Exit;
     finally
-      FJSON.Free;
-    end
+      LExcept.Free;
+    end;
   end;
-  if Assigned(OnError) then
-    OnError(LExcept)
-  else
-    raise LExcept;
+
+  FJSON := TJSONObject.ParseJSONValue(AResponse) as TJSONObject;
+  try
+    if FJSON.TryGetValue<string>('errorCode', LTest) then
+    begin
+      LExcept := TInvisionCommunityExcception.Create(FJSON.Values['errorCode'].Value, FJSON.Values['errorMessage'].Value);
+      try
+        DoCallError(LExcept);
+        Exit;
+      finally
+        LExcept.Free;
+      end;
+    end;
+  finally
+    FJSON.Free;
+  end
 end;
 
 function TicRequest.Get: string;

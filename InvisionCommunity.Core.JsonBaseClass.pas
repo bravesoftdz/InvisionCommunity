@@ -19,7 +19,7 @@ type
     function ReadToArray<TI: IInterface>(TgClass: TBaseJsonClass; const AKey: string): TArray<TI>;
   public
     class function FromJson(const AJson: string): TBaseJson;
-    class function GetTgClass: TBaseJsonClass; virtual;// abstract;
+    class function GetTgClass: TBaseJsonClass; virtual; // abstract;
 
     class procedure UnSupported;
     constructor Create(const AJson: string); virtual;
@@ -70,13 +70,13 @@ var
   I: Integer;
   GUID: TGUID;
 begin
-    // stage 1: type checking
-    //cache value fot further use
+  // stage 1: type checking
+  // cache value fot further use
   GUID := GetTypeData(TypeInfo(TI))^.GUID;
-    //check for TI interface support
+  // check for TI interface support
   if TgClass.GetInterfaceEntry(GUID) = nil then
     raise Exception.Create('GetArrayFromMethod: unsupported interface for ' + TgClass.ClassName);
-    // stage 2: proceed data
+  // stage 2: proceed data
   LJsonArray := FJSON.GetValue(AKey) as TJSONArray;
   if (not Assigned(LJsonArray)) or LJsonArray.Null then
     Exit(nil);

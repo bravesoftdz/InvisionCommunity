@@ -1,7 +1,6 @@
 program InvComTest;
 
 {$APPTYPE CONSOLE}
-
 {$R *.res}
 
 uses
@@ -40,7 +39,7 @@ begin
     end;
 
   finally
-  //  icSystem.Free;
+    // icSystem.Free;
   end;
 end;
 
@@ -53,5 +52,6 @@ begin
     on E: Exception do
       Writeln(E.ClassName, ': ', E.Message);
   end;
+
 end.
 
