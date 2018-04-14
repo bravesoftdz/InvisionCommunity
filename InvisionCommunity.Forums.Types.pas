@@ -116,7 +116,7 @@ type
     function featured: Boolean;
     function archived: Boolean;
     function poll: IicPollObject;
-    function url: string;
+    function Url: string;
     function rating: Single;
   end;
 
@@ -200,7 +200,7 @@ end;
 
 function TicTopicObject.ID: Integer;
 begin
-
+  Result := ReadToSimpleType<Integer>('id');
 end;
 
 function TicTopicObject.lastPost: IicPostObject;
