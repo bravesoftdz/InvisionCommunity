@@ -106,11 +106,11 @@ procedure TicRequest.DoCheckError(const AResponse: string);
 var
   FJSON: TJSONObject;
   LTest: string;
-  LExcept: TInvisionCommunityExcception;
+  LExcept: TicExcception;
 begin
   if AResponse.contains('<!DOCTYPE html>') then
   begin
-    LExcept := TInvisionCommunityExcception.Create('Website return html');
+    LExcept := TicExcception.Create('Website return html');
     try
       DoCallError(LExcept);
       Exit;
@@ -123,7 +123,8 @@ begin
   try
     if FJSON.TryGetValue<string>('errorCode', LTest) then
     begin
-      LExcept := TInvisionCommunityExcception.Create(FJSON.Values['errorCode'].Value, FJSON.Values['errorMessage'].Value);
+      LExcept := TicExcception.Create(FJSON.Values['errorCode'].Value, FJSON.Values
+        ['errorMessage'].Value);
       try
         DoCallError(LExcept);
         Exit;
@@ -138,7 +139,12 @@ end;
 
 function TicRequest.Get: string;
 begin
-  Result := FHttp.Get(Url.ToString, nil, [FBasicAuth]).ContentAsString;
+  try
+    Result := FHttp.Get(Url.ToString, nil, [FBasicAuth]).ContentAsString;
+  except
+    on E: Exception do
+      DoCallError(E);
+  end;
   DoCheckError(Result);
 end;
 
@@ -170,7 +176,8 @@ end;
 procedure TicRequest.SetToken(const Value: string);
 begin
   FToken := Value;
-  FBasicAuth := TNetHeader.Create('Authorization', 'Basic ' + TNetEncoding.Base64.Encode(Value + ':'));
+  FBasicAuth := TNetHeader.Create('Authorization', 'Basic ' + TNetEncoding.Base64.Encode
+    (Value + ':'));
 end;
 
 procedure TicRequest.SetUrl(const Value: TURI);

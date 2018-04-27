@@ -6,7 +6,7 @@ uses
   System.SysUtils;
 
 type
-  TInvisionCommunityExcception = class(Exception)
+  TicExcception = class(Exception)
   private
     FCode: string;
   public
@@ -19,7 +19,7 @@ implementation
 
 { TInvisionCommunityExcception }
 
-constructor TInvisionCommunityExcception.Create(const Code, Msg: string);
+constructor TicExcception.Create(const Code, Msg: string);
 begin
   inherited Create(Msg);
   FCode := Code;
