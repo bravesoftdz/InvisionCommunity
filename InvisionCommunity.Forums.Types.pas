@@ -170,7 +170,7 @@ end;
 
 function TicTopicObject.archived: Boolean;
 begin
-
+  Result := ReadToSimpleType<Boolean>('archived');
 end;
 
 function TicTopicObject.bestAnswer: IicPostObject;
@@ -180,7 +180,7 @@ end;
 
 function TicTopicObject.featured: Boolean;
 begin
-
+  Result := ReadToSimpleType<Boolean>('featured');
 end;
 
 function TicTopicObject.firstPost: IicPostObject;
@@ -195,7 +195,7 @@ end;
 
 function TicTopicObject.hidden: Boolean;
 begin
-
+  Result := ReadToSimpleType<Boolean>('hidden');
 end;
 
 function TicTopicObject.ID: Integer;
@@ -210,12 +210,12 @@ end;
 
 function TicTopicObject.locked: Boolean;
 begin
-
+  Result := ReadToSimpleType<Boolean>('locked');
 end;
 
 function TicTopicObject.pinned: Boolean;
 begin
-
+  Result := ReadToSimpleType<Boolean>('pinned');
 end;
 
 function TicTopicObject.poll: IicPollObject;
@@ -225,7 +225,7 @@ end;
 
 function TicTopicObject.Posts: Integer;
 begin
-
+  Result := ReadToSimpleType<Integer>('posts');
 end;
 
 function TicTopicObject.Prefix: string;
@@ -235,7 +235,7 @@ end;
 
 function TicTopicObject.rating: Single;
 begin
-
+  Result := ReadToSimpleType<Single>('rating');
 end;
 
 function TicTopicObject.tags: TArray<string>;
@@ -255,7 +255,7 @@ end;
 
 function TicTopicObject.Views: Integer;
 begin
-
+  Result := ReadToSimpleType<Integer>('views');
 end;
 
 end.
